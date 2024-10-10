@@ -1,119 +1,115 @@
-/* Listar Veterinários com Especialidade Específica */
-SELECT *
-FROM VETERINARIO
-WHERE ESPECIALIDADE  = 'Dermatologista'
+/* Atividades Update */
 
-/* Buscar Pacientes por Faixa Etária */
-SELECT *
-FROM PACIENTE p 
-WHERE p.IDADE <= 5 AND p.IDADE >= 2
+/* 1 - Atualizar peso do paciente 1 para 8.5 kg */
+UPDATE PACIENTE p SET p.peso = 8.5
+WHERE p.id_paciente = 1
 
-/* Listar Agendamentos em um Período Específico */
-SELECT *
-FROM AGENDAMENTO a 
-WHERE a.DATA_HORA BETWEEN '2024/01/01 00:00:00' AND '2024/03/31 23:59:59'
+SELECT * FROM PACIENTE
 
-/* Buscar Medicamentos com Preço Superior a Um Valor */
-SELECT *
-FROM MEDICAMENTOS m 
-WHERE PRECO > 25
+/* 2 - Atualizar estoque do medicamento 3 */
+UPDATE MEDICAMENTOS m SET m.ESTOQUE = 50
+WHERE m.ID_MEDICAMENTO = 3
 
-/* Filtrar Receitas por Data e Veterinário */
-SELECT *
-FROM RECEITA r 
-WHERE r.DATA_EMISSAO > '2024-06-01'
-AND r.ID_AGENDAMENTO = (
-	SELECT ID_AGENDAMENTO
+SELECT * FROM MEDICAMENTOS m 
+
+/* 3 - Atualizar data de nascimento do tutor 2 */
+UPDATE TUTOR t SET t.DATA_NASCIMENTO = '2001-05-15'
+WHERE t.ID_TUTOR = 2
+
+SELECT * FROM TUTOR t 
+
+/* 4 - Atualizar motivo da consulta do paciente 5 */
+UPDATE AGENDAMENTO a SET a.MOTIVO = 'Dor de barriga severa'
+WHERE a.ID_AGENDAMENTO = 5
+
+SELECT * FROM AGENDAMENTO a 
+
+/* 5 - Atualizar descrição do medicamento 6 */
+UPDATE MEDICAMENTOS m SET m.DESCRICAO = 'Anti-inflamatório para articulações'
+WHERE m.ID_MEDICAMENTO = 6
+
+SELECT * FROM MEDICAMENTOS m 
+
+/* 6 - Atualizar nome do tutor */
+UPDATE TUTOR t SET t.NOME = 'Maria Oliveira'
+WHERE t.ID_TUTOR = 3
+
+SELECT * FROM TUTOR
+
+/* 7 - Atualizar a descrição do medicamento 2 */
+UPDATE MEDICAMENTOS m SET m.DESCRICAO = 'Aplicar no olho afetado a cada 4 horas'
+WHERE m.ID_MEDICAMENTO = 2
+
+SELECT * FROM MEDICAMENTOS m 
+
+/* 8 - Atualizar endereço do tutor */
+UPDATE TUTOR t SET t.ENDERECO = 'Rua dos Girassóis, 123'
+WHERE t.ID_TUTOR = 4
+
+SELECT * FROM TUTOR
+
+/* 9 -Deletar consulta com ID 7 */
+DELETE FROM AGENDAMENTO a
+WHERE a.ID_AGENDAMENTO = 7
+
+SELECT * FROM AGENDAMENTO a 
+
+/* 10 -Deletar medicamento com ID 8 */
+DELETE FROM MEDICAMENTOS m
+WHERE m.ID_MEDICAMENTO = 8
+
+SELECT * FROM MEDICAMENTOS m 
+
+/* 11 - Deletar animais com ID tutor 5 */
+DELETE FROM RECEITA r
+WHERE r.ID_AGENDAMENTO IN (
+	SELECT a.ID_AGENDAMENTO
 	FROM AGENDAMENTO a 
-	WHERE a.ID_VETERINARIO = (
-		SELECT ID_VETERINARIO
-		FROM VETERINARIO v 
-		WHERE NOME = 'Dr. Ana Souza'
+	WHERE a.ID_PACIENTE IN (
+		SELECT p.ID_PACIENTE
+		FROM PACIENTE p
+		WHERE p.ID_TUTOR = 5
 	)
 )
 
-/* Listar Pacientes de Um Tutor Específico */
-SELECT *
-FROM PACIENTE p 
-WHERE p.ID_TUTOR = (
-	SELECT ID_TUTOR
-	FROM TUTOR t
-	WHERE t.nome = 'Maria Silva'
+DELETE FROM AGENDAMENTO a
+WHERE a.ID_PACIENTE IN (
+	SELECT p.ID_PACIENTE
+	FROM PACIENTE p
+	WHERE p.ID_TUTOR = 5
 )
 
-/* Buscar Itens de Receita para Medicamento Específico */
-SELECT *
-FROM ITENSRECEITA i 
-WHERE i.ID_MEDICAMENTO = (
-	SELECT ID_MEDICAMENTO 
-	FROM MEDICAMENTOS m 
-	WHERE nome = 'Anti-inflamatório Y'
+DELETE FROM PACIENTE p
+WHERE p.ID_TUTOR = 5
+
+SELECT * FROM PACIENTE p 
+
+/* 12 - Deletar todos as receitas e itens que não estão atrelados a nenhum agendamento */
+
+DELETE FROM RECEITA r
+WHERE r.ID_AGENDAMENTO NOT IN (
+	SELECT a.ID_AGENDAMENTO
+	FROM AGENDAMENTO a
 )
 
-/* Contar Pacientes por Tutor */
-SELECT t.NOME,
-		(
-		 SELECT COUNT(*)
-		 FROM PACIENTE p 
-		 WHERE p.ID_TUTOR = t.ID_TUTOR 
-		) AS total_animais
-FROM TUTOR t
-
-/* Listar Agendamentos por Veterinário e Motivo */
-SELECT *
-FROM AGENDAMENTO a 
-WHERE a.ID_VETERINARIO = (
-	SELECT v.ID_VETERINARIO 
-	FROM VETERINARIO v 
-	WHERE v.NOME = 'Dr. Pedro Lima'
-) AND a.MOTIVO = 'Exame de sangue'
-
-/* Listar Medicamentos com Descrição Não Nula e Preço Inferior a 50 Reais */
-SELECT *
-FROM MEDICAMENTOS m 
-WHERE m.DESCRICAO != ''
-AND m.PRECO < 50
-
-/* Listar Pacientes com Peso Entre Dois Valores */
-SELECT *
-FROM PACIENTE p 
-WHERE p.PESO BETWEEN 3 AND 10
-
-/* Buscar Pacientes de um Tutor e com Peso Superior a um Valor */
-SELECT *
-FROM PACIENTE p 
-WHERE p.ID_TUTOR = (
-	SELECT ID_TUTOR 
-	FROM TUTOR t 
-	WHERE t.NOME = 'Carlos Lima'
-) 
-AND p.PESO > 5
-
-/* Listar Pacientes de Especie 'Cão' com Peso Inferior a 7 kg */
-SELECT *
-FROM PACIENTE p 
-WHERE p.ESPECIE = 'Cão'
-AND p.PESO < 7
-
-/* Listar Agendamentos de um Período com Peso dos Pacientes */
-SELECT a.DATA_HORA, p.NOME, p.PESO
-FROM AGENDAMENTO a
-JOIN PACIENTE p ON a.ID_PACIENTE = p.ID_PACIENTE 
-WHERE a.DATA_HORA BETWEEN '2024-04-01' AND '2024-06-30'
-
-/* Listar Pacientes que Não Tiveram Consultas */
-SELECT *
-FROM PACIENTE p
-WHERE p.ID_PACIENTE NOT IN (
-	SELECT a.ID_PACIENTE 
-	FROM AGENDAMENTO a 
+DELETE FROM ITENSRECEITA i
+WHERE i.ID_RECEITA IN (
+	SELECT r.ID_RECEITA
+	FROM RECEITA r
+	WHERE r.ID_AGENDAMENTO NOT IN (
+		SELECT a.ID_AGENDAMENTO
+		FROM AGENDAMENTO a
+	)
 )
+/* Nenhum dado foi apagado */
 
-/* Listar Pacientes que Não Tiveram Consultas por periodo */
-SELECT *
-FROM PACIENTE p 
-JOIN AGENDAMENTO a2 ON p.ID_PACIENTE = a2.ID_PACIENTE 
-WHERE p.ID_PACIENTE NOT IN (
-	SELECT a.ID_PACIENTE 
-	FROM AGENDAMENTO a 
-) AND a2.DATA_HORA BETWEEN '2024-01-01' AND '2024-01-15'
+/* 13 - Deletar tutores que nasceram antes de 1987 */
+DELETE FROM TUTOR t
+WHERE t.DATA_NASCIMENTO < '1987-12-31'
+/* Nenhum dado foi apagado */
+
+/* 14 - Deletar itens da tabela receita no intervalo de 7 a 9*/
+DELETE FROM RECEITA r
+WHERE r.ID_RECEITA BETWEEN 7 AND 9
+
+SELECT * FROM RECEITA r 
